@@ -1,19 +1,27 @@
-import { useEffect } from "react";
-import CategoryItem from "../components/CategoryItem";
-import { useProductStore } from "../stores/useProductStore";
-import FeaturedProducts from "../components/FeaturedProducts";
+import { useEffect, useState } from 'react';
+import CategoryItem from '../components/CategoryItem';
+import { useProductStore } from '../stores/useProductStore';
+import FeaturedProducts from '../components/FeaturedProducts';
+import messager from '../../public/messenger.png';
+import Message from '../components/Message';
+import { useUserStore } from '../stores/useUserStore';
 
 const categories = [
-	{ href: "/jeans", name: "Jeans", imageUrl: "/jeans.jpg" },
-	{ href: "/t-shirts", name: "T-shirts", imageUrl: "/tshirts.jpg" },
-	{ href: "/shoes", name: "Shoes", imageUrl: "/shoes.jpg" },
-	{ href: "/glasses", name: "Glasses", imageUrl: "/glasses.png" },
-	{ href: "/jackets", name: "Jackets", imageUrl: "/jackets.jpg" },
-	{ href: "/suits", name: "Suits", imageUrl: "/suits.jpg" },
-	{ href: "/bags", name: "Bags", imageUrl: "/bags.jpg" },
+	{ href: '/jeans', name: 'Jeans', imageUrl: '/jeans.jpg' },
+	{ href: '/t-shirts', name: 'T-shirts', imageUrl: '/tshirts.jpg' },
+	{ href: '/shoes', name: 'Shoes', imageUrl: '/shoes.jpg' },
+	{ href: '/glasses', name: 'Glasses', imageUrl: '/glasses.png' },
+	{ href: '/jackets', name: 'Jackets', imageUrl: '/jackets.jpg' },
+	{ href: '/suits', name: 'Suits', imageUrl: '/suits.jpg' },
+	{ href: '/bags', name: 'Bags', imageUrl: '/bags.jpg' },
 ];
 
 const HomePage = () => {
+	const { user, logout } = useUserStore(); // custom hook to manage user state
+	const isAdmin = user?.role === 'admin';
+
+	const [isOpen, setIsOpen] = useState(false);
+
 	const { fetchFeaturedProducts, products, isLoading } = useProductStore();
 
 	useEffect(() => {
@@ -21,23 +29,41 @@ const HomePage = () => {
 	}, [fetchFeaturedProducts]);
 
 	return (
-		<div className='relative min-h-screen text-white overflow-hidden'>
-			<div className='relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16'>
-				<h1 className='text-center text-5xl sm:text-6xl font-bold text-emerald-400 mb-4'>
+		<div className="relative min-h-screen text-white overflow-hidden">
+			<div className="relative z-10 mb-3 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+				<h1 className="text-center text-5xl sm:text-6xl font-bold text-emerald-400 mb-4">
 					Explore Our Categories
 				</h1>
-				<p className='text-center text-xl text-gray-300 mb-12'>
+				<p className="text-center text-xl text-gray-300 mb-12">
 					Discover the latest trends in eco-friendly fashion
 				</p>
 
-				<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
+				<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
 					{categories.map((category) => (
 						<CategoryItem category={category} key={category.name} />
 					))}
 				</div>
 
-				{!isLoading && products.length > 0 && <FeaturedProducts featuredProducts={products} />}
+				{!isLoading && products.length > 0 && (
+					<FeaturedProducts featuredProducts={products} />
+				)}
 			</div>
+			{/* Messenger Icon */}
+			{!isAdmin && (
+				<>
+					<div className="fixed bottom-4 right-4 z-50 p-4">
+						<img
+							src={messager}
+							alt="Messenger Icon"
+							className="w-[60px] h-[60px] object-cover cursor-pointer"
+							onClick={() => setIsOpen(!isOpen)}
+						/>
+					</div>
+
+					{/* Modal chat messenger mini */}
+					{isOpen && <Message closeModal={() => setIsOpen(false)} />}
+				</>
+			)}
 		</div>
 	);
 };

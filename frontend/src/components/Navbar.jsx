@@ -27,6 +27,7 @@ const Navbar = () => {
 						>
 							Home
 						</Link>
+						
 						{user && (
 							<Link
 								to={'/cart'}
